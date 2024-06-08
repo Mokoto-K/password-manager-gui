@@ -1,17 +1,19 @@
 from tkinter import ttk, messagebox, scrolledtext
+from random import choice, shuffle
 import database as data
 import tkinter as tk
 import sys
 
-# TODO: Sort entries in manage passwords, alphabetically
-# TODO: Add scroll bar in manage passwords treeview, so that you can see a longer list of password
-# TODO: Write up full doc strings
 # TODO: Write up Readme
-# TODO: Implement login window
+# TODO: Build login window, think of hashing login password, locking database, and email recovery of account
 # TODO: Change visual design to look.... better..
+# TODO: Implement a list of predefined websites to choose from who have urls built in & make option to add more
+# TODO: Delete selected button
 
 
 def add_password(event=None):
+    """Adds an Entry to the database. Must include a website, email and password for function to work"""
+
     # Deals with empty fields case, all fields need to be filled or else database will throw error
     if website.get() == "" or email.get() == "" or password.get() == "":
         return messagebox.showinfo("Missing fields", "Information missing")
@@ -39,15 +41,35 @@ def add_password(event=None):
         password.delete(0, tk.END)
 
 
+def generate():
+    """Automatically generates a password and displays it in the password entry box in the main window"""
+
+    ls1= ['a','b','c','d','e','f','g','h','j','k','l','p','o','i','u','y','t','r','w','q','s','z','x,','v','n','m']
+    ls2=['1','2','3','4','5','6','7','8','9','0']
+    ls3=['!','#','$','%','&','*','?','(',')','.']
+    generated = []
+    for i in range(3):
+        generated.extend([choice(ls1), choice(ls1).capitalize(), choice(ls2), choice(ls3)])
+        shuffle(generated)
+    gen_pass = "".join(generated)
+
+    return pass_variable.set(gen_pass)
+
+
 def manage_passwords():
-    """Reads, Updates and Deletes Passwords"""
+    """Window that Reads, Updates and Deletes Passwords, most of the database management is reached from this window"""
 
     window.deiconify()
     frame = tk.Frame(window, pady=5, padx=5)
     frame.grid(column=0, row=0)
     tk.Label(frame, text="List of Passwords", font=("Arial", 24, 'bold')).grid(column=0, row=0, columnspan=8)
 
+    # Creates the view box for all database entries to render in
     tree_box = ttk.Treeview(frame, columns=("1", '2', '3'), show='headings', selectmode="browse")
+    scrollbar = ttk.Scrollbar(frame, orient="vertical", command=tree_box.yview)
+    tree_box.configure(yscrollcommand=scrollbar.set)
+    # Creates Scrollbar
+    scrollbar.grid(column=9, row=1, sticky="N S E W")
     tree_box.grid(column=0, row=1, columnspan=8)
 
     tree_box.heading('1', text="Website")
@@ -56,7 +78,7 @@ def manage_passwords():
 
     # Reads all entries in the passwords database and inputs them all into a scrollable text box on screen.
     with data.app.app_context():
-        for entry in data.db.session.scalars(data.db.select(data.Passwords)).all():
+        for entry in data.db.session.scalars(data.db.select(data.Passwords).order_by(data.Passwords.website)).all():
             tree_box.insert('', 'end', values=(entry.website, entry.email, entry.password))
 
     (ttk.Button(frame, text="Edit", command=lambda: edit_selection(tree_box.item(tree_box.focus())['values']))
@@ -68,14 +90,18 @@ def manage_passwords():
 # Prevents multiple instances of the "Manage passwords" window from appearing by hiding the window on exit. Without this
 # If a user was to click the manage passwords button while the window was already up it would open another window
 def manage_passwords_event():
+    """Hides the password manager window, usually called when another window has been activated"""
     window.withdraw()
     pass
 
 
 def edit_selection(selected):
+    """Edits the selected entry in the database"""
+    # Checks for no selection
     if selected == '':
         return messagebox.showinfo("Nothing Selected", "Select an entry to edit")
 
+    # Mostly just window generation for the edit view
     manage_passwords_event()
     edit_window.deiconify()
     frame = tk.Frame(edit_window, pady=5, padx=5)
@@ -107,6 +133,7 @@ def edit_selection(selected):
 
 # window operates.
 def confirm_edit(selected, edit_website, edit_email, edit_password, event=None):
+    """Deals with confirming the changes to the database entry"""
     with data.app.app_context():
         entry = data.db.session.scalar(data.db.select(data.Passwords).where(data.Passwords.website == selected[0]))
         entry.id = entry.id
@@ -119,11 +146,13 @@ def confirm_edit(selected, edit_website, edit_email, edit_password, event=None):
 
 # hides edit window and un hides manager window, this is a better option then destroying and re-creating these windows
 def edit_window_event():
+    """Identical to the manage passwords view, but for the edit window, hides it if not in use."""
     edit_window.withdraw()
     return manage_passwords()
 
 
 def delete(selected):
+    """Deletes the selected entry in the database"""
     if selected == '':
         return messagebox.showinfo("No selection", "No entry selected")
 
@@ -193,13 +222,15 @@ ttk.Label(mainframe, text="Enter password: ").grid(column=0, row=2, sticky="W")
 
 website = ttk.Entry(mainframe)
 email = ttk.Entry(mainframe)
-password = ttk.Entry(mainframe)
+pass_variable = tk.StringVar()
+password = ttk.Entry(mainframe, textvariable=pass_variable)
 
 website.grid(column=1, row=0, columnspan=2)
 email.grid(column=1, row=1, columnspan=2)
 password.grid(column=1, row=2, columnspan=2)
 (ttk.Button(mainframe, text="Add", command=add_password)).grid(column=1, row=3)
 ttk.Button(mainframe, text="Passwords", command=manage_passwords).grid(column=2, row=3)
+ttk.Button(mainframe, text="Generate Random Password", command=generate).grid(column=1, columnspan=2, row=4)
 
 # For building purposes, this is turned off until finished
 # root.withdraw()
