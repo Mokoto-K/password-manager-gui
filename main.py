@@ -59,8 +59,8 @@ def generate():
 def manage_passwords():
     """Window that Reads, Updates and Deletes Passwords, most of the database management is reached from this window"""
 
-    window.deiconify()
-    frame = tk.Frame(window, pady=5, padx=5)
+    manage_passwords_window.deiconify()
+    frame = tk.Frame(manage_passwords_window, pady=5, padx=5)
     frame.grid(column=0, row=0)
     tk.Label(frame, text="List of Passwords", font=("Arial", 24, 'bold')).grid(column=0, row=0, columnspan=8)
 
@@ -91,7 +91,7 @@ def manage_passwords():
 # If a user was to click the manage passwords button while the window was already up it would open another window
 def manage_passwords_event():
     """Hides the password manager window, usually called when another window has been activated"""
-    window.withdraw()
+    manage_passwords_window.withdraw()
     pass
 
 
@@ -169,46 +169,59 @@ def delete(selected):
 # def login():
 #     if entry1.get() == 'user' and entry2.get() == 'asdf':
 #         root.deiconify()
-#         top.destroy()
+#         login_window.destroy()
 #
 #
 # def close():
-#     top.destroy()
+#     login_window.destroy()
 #     root.destroy()
 #     sys.exit()
 
 
 # ----------------------------------------GUI--------------------------------------------
 root = tk.Tk()
-window = tk.Toplevel(root)
-window.withdraw()
+manage_passwords_window = tk.Toplevel(root)
+manage_passwords_window.withdraw()
 edit_window = tk.Toplevel(root)
 edit_window.withdraw()
-# top = tk.Toplevel()
-# top.title("Login to MK-Pass")
+# login_window = tk.Toplevel()
+# login_window.title("Login to MK-Pass")
 root.title("MK - Password Manager")
 
 # LOGIN WINDOW--------------------------------------
-# login_canvas = tk.Canvas(top, height=200, width=200)
+# Main canvas for login window
+# login_canvas = tk.Canvas(login_window, height=555, width=700)
+# login_canvas.configure(background= "black")
 # login_canvas.grid(column=0, row=0)
 #
-# login_frame = ttk.Frame(top, width=1000, height=1000, padding=20)
+# # Main frame for login window
+# login_frame = ttk.Frame(login_window, width=1000, height=1000, padding=20)
 # login_frame.grid(column=0, row=0)
 #
-# ttk.Label(login_frame, text="Enter Username", padding=5).grid(column=0, row=0, sticky="W")
-# ttk.Label(login_frame, text="Enter Password", padding=5).grid(column=0, row=2, sticky="W")
-# entry1= ttk.Entry(login_frame)
-# entry2= ttk.Entry(login_frame)
-# button1 = ttk.Button(login_frame, text="Login", command=login)
-# button2 = tk.Button(login_frame, text="Close", command=close)
+# # Three frames to split all components in the login window
+# heading_frame = ttk.Frame(login_frame, width=1000, height=1000, padding=20)
+# heading_frame.grid(column=0, row=1)
+# entry_frame = ttk.Frame(login_frame, width=1000, height=1000, padding=20)
+# entry_frame.grid(column=0, row=2)
+# bottom_frame = ttk.Frame(login_frame, width=1000, height=1000, padding=20)
+# bottom_frame.grid(column=0, row=3)
 #
-# entry1.grid(column=0, row=1, columnspan=2)
-# entry2.grid(column=0, row=3, columnspan=2)
-# button1.grid(column=0, row=4, sticky="W")
-# button2.grid(column=1, row=4)
+#
+# ttk.Label(heading_frame, text="Welcome", font=("Arial", 50)).grid(column=0, row=0, columnspan=2, sticky="N")
+# ttk.Label(entry_frame, text="Username", padding=10).grid(column=0, row=1, sticky="W")
+# ttk.Label(entry_frame, text="Password", padding=10).grid(column=0, row=2, sticky="W")
+# entry1 = ttk.Entry(entry_frame)
+# entry2 = ttk.Entry(entry_frame)
+# button1 = ttk.Button(entry_frame, text="Login", command=login).grid(column=1, row=5, columnspan=2, sticky="W E")
+#
+# ttk.Button(bottom_frame, text="Register", command="").grid(column=1, row=6, columnspan=2, sticky="W E")
+# ttk.Button(bottom_frame, text="Forgot Password?", command="").grid(column=1, row=7, columnspan=2, sticky="W E")
+#
+# entry1.grid(column=1, row=1, columnspan=2, sticky="W E")
+# entry2.grid(column=1, row=2, columnspan=2, sticky="W E")
 
 # MAIN WINDOW------------------------------------------
-canvas = tk.Canvas(height=555, width=700)
+canvas = tk.Canvas(root, height=555, width=700)
 canvas.grid(column=0, row=0)
 image = tk.PhotoImage(file='mk-logo-copy.png')
 canvas.create_image(350, 270, image=image)
@@ -237,5 +250,5 @@ ttk.Button(mainframe, text="Generate Random Password", command=generate).grid(co
 
 # Lets you confirm an entry with the enter key
 root.bind('<Return>', add_password)
-window.protocol("WM_DELETE_WINDOW", manage_passwords_event)
+manage_passwords_window.protocol("WM_DELETE_WINDOW", manage_passwords_event)
 root.mainloop()
