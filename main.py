@@ -221,34 +221,54 @@ root.title("MK - Password Manager")
 # entry2.grid(column=1, row=2, columnspan=2, sticky="W E")
 
 # MAIN WINDOW------------------------------------------
-canvas = tk.Canvas(root, height=555, width=700)
-canvas.grid(column=0, row=0)
+canvas = tk.Canvas(root, height=100, width=700)
+canvas.grid(column=0, row=1)
 image = tk.PhotoImage(file='mk-logo-copy.png')
-canvas.create_image(350, 270, image=image)
+canvas.create_image(915, 330, image=image)
 
-mainframe = ttk.Frame(root, width=1000, height=1000, padding=20)
+mainframe = ttk.Frame(root, padding=50)
 mainframe.grid(column=0, row=0)
 
-ttk.Label(mainframe, text="Enter website: ").grid(column=0, row=0, sticky="W")
-ttk.Label(mainframe, text="Enter email/username: ").grid(column=0, row=1, sticky="W")
-ttk.Label(mainframe, text="Enter password: ").grid(column=0, row=2, sticky="W")
+heading = ttk.Label(mainframe, text="WELCOME BACK, USER11495", font=("Arial  30"), padding=50).grid(column=0, row = 0, columnspan=2)
 
-website = ttk.Entry(mainframe)
-email = ttk.Entry(mainframe)
+website_frame = ttk.Frame(mainframe, padding=10)
+website_frame.grid(column=1, row=1, sticky="W E")
+email_frame = ttk.Frame(mainframe, padding=10)
+email_frame.grid(column=1, row=2, sticky="W E")
+password_frame = ttk.Frame(mainframe, padding=10)
+password_frame.grid(column=1, row=3, sticky="W E")
+
+menubar = tk.Menu(root)
+password_menu = tk.Menu(menubar, tearoff=False)
+menubar.add_cascade(menu=password_menu, label="Passwords")
+password_menu.add_command(label="Manage Passwords", command=manage_passwords)
+
+ttk.Label(website_frame, text="Website: ").grid(column=0, row=0, sticky="W")
+ttk.Label(email_frame, text="Email/username: ").grid(column=0, row=0, sticky="W")
+ttk.Label(password_frame, text="Password: ").grid(column=0, row=0, sticky="W")
+
+website = ttk.Entry(website_frame)
+email = ttk.Entry(email_frame)
 pass_variable = tk.StringVar()
-password = ttk.Entry(mainframe, textvariable=pass_variable)
+password = ttk.Entry(password_frame, textvariable=pass_variable)
 
-website.grid(column=1, row=0, columnspan=2)
-email.grid(column=1, row=1, columnspan=2)
-password.grid(column=1, row=2, columnspan=2)
-(ttk.Button(mainframe, text="Add", command=add_password)).grid(column=1, row=3)
-ttk.Button(mainframe, text="Passwords", command=manage_passwords).grid(column=2, row=3)
-ttk.Button(mainframe, text="Generate Random Password", command=generate).grid(column=1, columnspan=2, row=4)
+website.grid(column=0, row=1, sticky="W E")
+email.grid(column=0, row=1, sticky="W E")
+password.grid(column=0, row=1, sticky="W E")
+
+ttk.Button(password_frame, text="Generate Random", command=generate).grid(column=0, row=2, sticky="W E")
+
+add = ttk.Button(password_frame, text="Add", command=add_password)
+add.grid(column=0, row=3, sticky="W E")
+add.configure(padding=20)
+# ttk.Button(mainframe, text="Manage Passwords", command=manage_passwords).grid(column=0, row=0, columnspan=2,sticky="E")
+
 
 # For building purposes, this is turned off until finished
 # root.withdraw()
 
 # Lets you confirm an entry with the enter key
 root.bind('<Return>', add_password)
+root.config(menu=menubar)
 manage_passwords_window.protocol("WM_DELETE_WINDOW", manage_passwords_event)
 root.mainloop()
