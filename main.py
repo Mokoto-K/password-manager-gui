@@ -68,7 +68,9 @@ def manage_passwords():
     tree_box = ttk.Treeview(frame, columns=("1", '2', '3'), show='headings', selectmode="browse")
     scrollbar = ttk.Scrollbar(frame, orient="vertical", command=tree_box.yview)
     tree_box.configure(yscrollcommand=scrollbar.set)
-    # Creates Scrollbar
+
+
+    # # Creates Scrollbar
     scrollbar.grid(column=9, row=1, sticky="N S E W")
     tree_box.grid(column=0, row=1, columnspan=8)
 
@@ -81,10 +83,19 @@ def manage_passwords():
         for entry in data.db.session.scalars(data.db.select(data.Passwords).order_by(data.Passwords.website)).all():
             tree_box.insert('', 'end', values=(entry.website, entry.email, entry.password))
 
+
     (ttk.Button(frame, text="Edit", command=lambda: edit_selection(tree_box.item(tree_box.focus())['values']))
      .grid(column=0, row=5))
     (ttk.Button(frame, text="Delete", command=lambda: delete(tree_box.item(tree_box.focus())['values']))
      .grid(column=2, row=5))
+
+    # TODO deal with case when no password is selected when you click the copy password button
+    def copy_button():
+        manage_passwords_window.clipboard_clear()
+        manage_passwords_window.clipboard_append(tree_box.item(tree_box.focus())['values'][2])
+
+    ttk.Button(frame, text="Copy password", command=copy_button).grid(column=5, row=5)
+
 
 
 # Prevents multiple instances of the "Manage passwords" window from appearing by hiding the window on exit. Without this
